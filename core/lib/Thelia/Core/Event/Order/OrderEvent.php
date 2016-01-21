@@ -56,6 +56,9 @@ class OrderEvent extends ActionEvent
     protected $status = null;
 
     /** @var null|string */
+    protected $transactionRef = null;
+
+    /** @var null|string */
     protected $deliveryRef = null;
 
     /** @var null|int */
@@ -193,6 +196,16 @@ class OrderEvent extends ActionEvent
     }
 
     /**
+     * @param string $transactionRef the transaction reference
+     * @return $this
+     */
+    public function setTransactionRef($transactionRef)
+    {
+        $this->transactionRef = $transactionRef;
+        return $this;
+    }
+
+    /**
      * @param string $deliveryRef the delivery reference
      * @return $this
      */
@@ -278,6 +291,14 @@ class OrderEvent extends ActionEvent
     public function getStatus()
     {
         return $this->status;
+    }
+
+    /**
+     * @return null|string the transaction reference
+     */
+    public function getTransactionRef()
+    {
+        return $this->transactionRef;
     }
 
     /**
