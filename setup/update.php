@@ -88,56 +88,101 @@ $current = $update->getCurrentVersion();
 $files   = $update->getLatestVersion();
 $web     = $update->getWebVersion();
 
-while (1) {
-
-    if ($files != $web) {
-        cliOutput(sprintf(
-            "Thelia server is reporting the current stable release version is %s ",
-            $web
-        ), 'warning');
-    }
-
+if ($files != $web) {
     cliOutput(sprintf(
-        "You are going to update Thelia from version %s to version %s.",
-        $current,
-        $files
-    ), 'info');
+        "Thelia server is reporting the current stable release version is %s ",
+        $web
+    ), 'warning');
+}
 
-    if ($files < $web) {
+cliOutput(sprintf(
+    "You are going to update Thelia from version %s to version %s.",
+    $current,
+    $files
+), 'info');
 
+if ($files < $web) {
+    cliOutput(sprintf(
+        "Your files belongs to version %s, which is not the latest stable release.",
+        $web
+    ), 'warning');
+
+    while (1) {
         cliOutput(sprintf(
-            "Your files belongs to version %s, which is not the latest stable release.",
-            $web
-        ), 'warning');
-        cliOutput(sprintf(
-            "It is recommended to upgrade your files first then run this script again." . PHP_EOL
+            PHP_EOL . "It is recommended to upgrade manually your files first then run this script again." . PHP_EOL
             . "The latest version is available at http://thelia.net/#download ."
         ), 'warning');
-        cliOutput("Continue update process anyway ? (Y/n)");
-    } else {
-        cliOutput("Continue update process ? (Y/n)");
+        cliOutput("Continue update process anyway ? (Y/n)" . PHP_EOL);
+        $rep= readStdin(true);
+        if ($rep == 'y') {
+            break;
+        } elseif ($rep == 'n') {
+            cliOutput("Update aborted", 'warning');
+            exit(0);
+        }
     }
 
-    $rep = readStdin(true);
-    if ($rep == 'y') {
-        break;
-    } elseif ($rep == 'n') {
-        cliOutput("Update aborted", 'warning');
-        exit(0);
+    while (1) {
+        cliOutput(sprintf(
+            "Do you want this script upgrade to version %s (this will update files and db)(Y/n) ?",
+            $web
+        ));
+        $upgradeFiles = readStdin(true);
+        if ('y' == $upgradeFiles) {
+            cliOutput(sprintf(
+                "Upgrading files automatically will overwrite all core files" . PHP_EOL
+                . "If you made any modification to them, they will be lost." . PHP_EOL
+                . "The setup/update.php script will download the last release at http://thelia.net/#download ."
+            ), 'warning');
+            cliOutput(sprintf("Continue update files and database process anyway ? (Y/n)"));
+            break;
+        } elseif ($rep == 'n') {
+            cliOutput(sprintf(
+                "You can abort the process (CTRL+C) to upgrade your files then run this script again." . PHP_EOL
+                . "The latest version is available at http://thelia.net/#download ." . PHP_EOL
+            ), 'notice');
+            cliOutput(sprintf("Continue update process to %s anyway ? (Y/n)", $files));
+            break;
+        }
+    }
+} else {
+    while (1) {
+        cliOutput("Continue update process ? (Y/n)");
+        $rep = readStdin(true);
+        if ($rep == 'y') {
+            break;
+        } elseif ($rep == 'n') {
+            cliOutput("Update aborted", 'warning');
+            exit(0);
+        }
     }
 }
 
-$backup = false;
+$backupDb = false;
 while (1) {
     cliOutput(sprintf("Would you like to backup the current database before proceeding ? (Y/n)"));
-
     $rep = readStdin(true);
     if ($rep == 'y') {
-        $backup = true;
+        $backupDb = true;
         break;
     } elseif ($rep == 'n') {
-        $backup = false;
+        $backupDb = false;
         break;
+    }
+}
+
+if ($upgradeFiles) {
+    $backupFiles    = false;
+    while (1) {
+        cliOutput(sprintf("Would you like to backup the current database before proceeding ? (Y/n)"));
+        $rep = readStdin(true);
+        if ($rep == 'y') {
+            $backupFiles = true;
+            break;
+        } elseif ($rep == 'n') {
+            $backupFiles = false;
+            break;
+        }
     }
 }
 
@@ -148,8 +193,27 @@ while (1) {
 $updateError = null;
 
 try {
+
+    // {{{ backup and upgrade files
+    if (true === $backupFiles) {
+        try {
+            $backupFile = backupFiles();
+            if ($backupFile) {
+                cliOutput(sprintf(
+                    PHP_EOL . 'Your files has been backed up. The zip file : %s'. PHP_EOL,
+                    $backupFile
+                ), 'success');
+            }
+        } catch (\Exception $e) {
+            cliOutput('Sorry, your database can\'t be backed up. Reason : ' . $e->getMessage(), 'error');
+            exit(4);
+        }
+    }
+    updateFiles($update);
+    // }}}
+
     // backup db
-    if (true === $backup) {
+    if (true === $backupDb) {
         try {
             $update->backupDb();
             cliOutput(sprintf('Your database has been backed up. The sql file : %s', $update->getBackupFile()), 'info');
@@ -159,12 +223,10 @@ try {
         }
     }
     // update
-    $update->process($backup);
+    $update->process($backupDb);
 } catch (UpdateException $ex) {
     $updateError = $ex;
 }
-
-
 
 foreach ($update->getMessages() as $message) {
     cliOutput($message[0], $message[1]);
@@ -186,7 +248,7 @@ if (null === $updateError) {
         cliOutput(sprintf('[%s] %s' . PHP_EOL, $log[0], $log[1]), 'error');
     }
 
-    if (true === $backup) {
+    if (true === $backupDb) {
         while (1) {
             cliOutput("Would you like to restore the backup database ? (Y/n)");
 
@@ -234,8 +296,10 @@ foreach ($finder as $file) {
 }
 
 if (true === $hasDeleteError) {
-    cliOutput("The cache has not been cleared properly. Try to run the command manually : " .
-        "(sudo) php Thelia cache:clear (--env=prod).");
+    cliOutput(
+        "The cache has not been cleared properly. Try to run the command manually : " .
+        "(sudo) php Thelia cache:clear (--env=prod)."
+    );
 }
 
 cliOutput("Update process finished.", 'info');
