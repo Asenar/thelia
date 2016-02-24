@@ -26,7 +26,6 @@ use Thelia\Model\Map\ProductTableMap;
  * @method     ChildProductQuery orderByTaxRuleId($order = Criteria::ASC) Order by the tax_rule_id column
  * @method     ChildProductQuery orderByRef($order = Criteria::ASC) Order by the ref column
  * @method     ChildProductQuery orderByVisible($order = Criteria::ASC) Order by the visible column
- * @method     ChildProductQuery orderByPosition($order = Criteria::ASC) Order by the position column
  * @method     ChildProductQuery orderByTemplateId($order = Criteria::ASC) Order by the template_id column
  * @method     ChildProductQuery orderByBrandId($order = Criteria::ASC) Order by the brand_id column
  * @method     ChildProductQuery orderByVirtual($order = Criteria::ASC) Order by the virtual column
@@ -40,7 +39,6 @@ use Thelia\Model\Map\ProductTableMap;
  * @method     ChildProductQuery groupByTaxRuleId() Group by the tax_rule_id column
  * @method     ChildProductQuery groupByRef() Group by the ref column
  * @method     ChildProductQuery groupByVisible() Group by the visible column
- * @method     ChildProductQuery groupByPosition() Group by the position column
  * @method     ChildProductQuery groupByTemplateId() Group by the template_id column
  * @method     ChildProductQuery groupByBrandId() Group by the brand_id column
  * @method     ChildProductQuery groupByVirtual() Group by the virtual column
@@ -121,7 +119,6 @@ use Thelia\Model\Map\ProductTableMap;
  * @method     ChildProduct findOneByTaxRuleId(int $tax_rule_id) Return the first ChildProduct filtered by the tax_rule_id column
  * @method     ChildProduct findOneByRef(string $ref) Return the first ChildProduct filtered by the ref column
  * @method     ChildProduct findOneByVisible(int $visible) Return the first ChildProduct filtered by the visible column
- * @method     ChildProduct findOneByPosition(int $position) Return the first ChildProduct filtered by the position column
  * @method     ChildProduct findOneByTemplateId(int $template_id) Return the first ChildProduct filtered by the template_id column
  * @method     ChildProduct findOneByBrandId(int $brand_id) Return the first ChildProduct filtered by the brand_id column
  * @method     ChildProduct findOneByVirtual(int $virtual) Return the first ChildProduct filtered by the virtual column
@@ -135,7 +132,6 @@ use Thelia\Model\Map\ProductTableMap;
  * @method     array findByTaxRuleId(int $tax_rule_id) Return ChildProduct objects filtered by the tax_rule_id column
  * @method     array findByRef(string $ref) Return ChildProduct objects filtered by the ref column
  * @method     array findByVisible(int $visible) Return ChildProduct objects filtered by the visible column
- * @method     array findByPosition(int $position) Return ChildProduct objects filtered by the position column
  * @method     array findByTemplateId(int $template_id) Return ChildProduct objects filtered by the template_id column
  * @method     array findByBrandId(int $brand_id) Return ChildProduct objects filtered by the brand_id column
  * @method     array findByVirtual(int $virtual) Return ChildProduct objects filtered by the virtual column
@@ -239,7 +235,7 @@ abstract class ProductQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `ID`, `TAX_RULE_ID`, `REF`, `VISIBLE`, `POSITION`, `TEMPLATE_ID`, `BRAND_ID`, `VIRTUAL`, `CREATED_AT`, `UPDATED_AT`, `VERSION`, `VERSION_CREATED_AT`, `VERSION_CREATED_BY` FROM `product` WHERE `ID` = :p0';
+        $sql = 'SELECT `ID`, `TAX_RULE_ID`, `REF`, `VISIBLE`, `TEMPLATE_ID`, `BRAND_ID`, `VIRTUAL`, `CREATED_AT`, `UPDATED_AT`, `VERSION`, `VERSION_CREATED_AT`, `VERSION_CREATED_BY` FROM `product` WHERE `ID` = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -480,47 +476,6 @@ abstract class ProductQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(ProductTableMap::VISIBLE, $visible, $comparison);
-    }
-
-    /**
-     * Filter the query on the position column
-     *
-     * Example usage:
-     * <code>
-     * $query->filterByPosition(1234); // WHERE position = 1234
-     * $query->filterByPosition(array(12, 34)); // WHERE position IN (12, 34)
-     * $query->filterByPosition(array('min' => 12)); // WHERE position > 12
-     * </code>
-     *
-     * @param     mixed $position The value to use as filter.
-     *              Use scalar values for equality.
-     *              Use array values for in_array() equivalent.
-     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return ChildProductQuery The current query, for fluid interface
-     */
-    public function filterByPosition($position = null, $comparison = null)
-    {
-        if (is_array($position)) {
-            $useMinMax = false;
-            if (isset($position['min'])) {
-                $this->addUsingAlias(ProductTableMap::POSITION, $position['min'], Criteria::GREATER_EQUAL);
-                $useMinMax = true;
-            }
-            if (isset($position['max'])) {
-                $this->addUsingAlias(ProductTableMap::POSITION, $position['max'], Criteria::LESS_EQUAL);
-                $useMinMax = true;
-            }
-            if ($useMinMax) {
-                return $this;
-            }
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-        }
-
-        return $this->addUsingAlias(ProductTableMap::POSITION, $position, $comparison);
     }
 
     /**

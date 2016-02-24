@@ -25,7 +25,6 @@ use Thelia\Model\Map\ProductVersionTableMap;
  * @method     ChildProductVersionQuery orderByTaxRuleId($order = Criteria::ASC) Order by the tax_rule_id column
  * @method     ChildProductVersionQuery orderByRef($order = Criteria::ASC) Order by the ref column
  * @method     ChildProductVersionQuery orderByVisible($order = Criteria::ASC) Order by the visible column
- * @method     ChildProductVersionQuery orderByPosition($order = Criteria::ASC) Order by the position column
  * @method     ChildProductVersionQuery orderByTemplateId($order = Criteria::ASC) Order by the template_id column
  * @method     ChildProductVersionQuery orderByBrandId($order = Criteria::ASC) Order by the brand_id column
  * @method     ChildProductVersionQuery orderByVirtual($order = Criteria::ASC) Order by the virtual column
@@ -39,7 +38,6 @@ use Thelia\Model\Map\ProductVersionTableMap;
  * @method     ChildProductVersionQuery groupByTaxRuleId() Group by the tax_rule_id column
  * @method     ChildProductVersionQuery groupByRef() Group by the ref column
  * @method     ChildProductVersionQuery groupByVisible() Group by the visible column
- * @method     ChildProductVersionQuery groupByPosition() Group by the position column
  * @method     ChildProductVersionQuery groupByTemplateId() Group by the template_id column
  * @method     ChildProductVersionQuery groupByBrandId() Group by the brand_id column
  * @method     ChildProductVersionQuery groupByVirtual() Group by the virtual column
@@ -64,7 +62,6 @@ use Thelia\Model\Map\ProductVersionTableMap;
  * @method     ChildProductVersion findOneByTaxRuleId(int $tax_rule_id) Return the first ChildProductVersion filtered by the tax_rule_id column
  * @method     ChildProductVersion findOneByRef(string $ref) Return the first ChildProductVersion filtered by the ref column
  * @method     ChildProductVersion findOneByVisible(int $visible) Return the first ChildProductVersion filtered by the visible column
- * @method     ChildProductVersion findOneByPosition(int $position) Return the first ChildProductVersion filtered by the position column
  * @method     ChildProductVersion findOneByTemplateId(int $template_id) Return the first ChildProductVersion filtered by the template_id column
  * @method     ChildProductVersion findOneByBrandId(int $brand_id) Return the first ChildProductVersion filtered by the brand_id column
  * @method     ChildProductVersion findOneByVirtual(int $virtual) Return the first ChildProductVersion filtered by the virtual column
@@ -78,7 +75,6 @@ use Thelia\Model\Map\ProductVersionTableMap;
  * @method     array findByTaxRuleId(int $tax_rule_id) Return ChildProductVersion objects filtered by the tax_rule_id column
  * @method     array findByRef(string $ref) Return ChildProductVersion objects filtered by the ref column
  * @method     array findByVisible(int $visible) Return ChildProductVersion objects filtered by the visible column
- * @method     array findByPosition(int $position) Return ChildProductVersion objects filtered by the position column
  * @method     array findByTemplateId(int $template_id) Return ChildProductVersion objects filtered by the template_id column
  * @method     array findByBrandId(int $brand_id) Return ChildProductVersion objects filtered by the brand_id column
  * @method     array findByVirtual(int $virtual) Return ChildProductVersion objects filtered by the virtual column
@@ -175,7 +171,7 @@ abstract class ProductVersionQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `ID`, `TAX_RULE_ID`, `REF`, `VISIBLE`, `POSITION`, `TEMPLATE_ID`, `BRAND_ID`, `VIRTUAL`, `CREATED_AT`, `UPDATED_AT`, `VERSION`, `VERSION_CREATED_AT`, `VERSION_CREATED_BY` FROM `product_version` WHERE `ID` = :p0 AND `VERSION` = :p1';
+        $sql = 'SELECT `ID`, `TAX_RULE_ID`, `REF`, `VISIBLE`, `TEMPLATE_ID`, `BRAND_ID`, `VIRTUAL`, `CREATED_AT`, `UPDATED_AT`, `VERSION`, `VERSION_CREATED_AT`, `VERSION_CREATED_BY` FROM `product_version` WHERE `ID` = :p0 AND `VERSION` = :p1';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key[0], PDO::PARAM_INT);
@@ -428,47 +424,6 @@ abstract class ProductVersionQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(ProductVersionTableMap::VISIBLE, $visible, $comparison);
-    }
-
-    /**
-     * Filter the query on the position column
-     *
-     * Example usage:
-     * <code>
-     * $query->filterByPosition(1234); // WHERE position = 1234
-     * $query->filterByPosition(array(12, 34)); // WHERE position IN (12, 34)
-     * $query->filterByPosition(array('min' => 12)); // WHERE position > 12
-     * </code>
-     *
-     * @param     mixed $position The value to use as filter.
-     *              Use scalar values for equality.
-     *              Use array values for in_array() equivalent.
-     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return ChildProductVersionQuery The current query, for fluid interface
-     */
-    public function filterByPosition($position = null, $comparison = null)
-    {
-        if (is_array($position)) {
-            $useMinMax = false;
-            if (isset($position['min'])) {
-                $this->addUsingAlias(ProductVersionTableMap::POSITION, $position['min'], Criteria::GREATER_EQUAL);
-                $useMinMax = true;
-            }
-            if (isset($position['max'])) {
-                $this->addUsingAlias(ProductVersionTableMap::POSITION, $position['max'], Criteria::LESS_EQUAL);
-                $useMinMax = true;
-            }
-            if ($useMinMax) {
-                return $this;
-            }
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-        }
-
-        return $this->addUsingAlias(ProductVersionTableMap::POSITION, $position, $comparison);
     }
 
     /**
