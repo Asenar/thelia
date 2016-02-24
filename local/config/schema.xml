@@ -83,6 +83,7 @@
     <column name="product_id" primaryKey="true" required="true" type="INTEGER" />
     <column name="category_id" primaryKey="true" type="INTEGER" />
     <column name="default_category" type="BOOLEAN" />
+    <column defaultValue="0" name="position" required="true" type="INTEGER" />
     <foreign-key foreignTable="product" name="fk_product_has_category_product1" onDelete="CASCADE" onUpdate="RESTRICT">
       <reference foreign="id" local="product_id" />
     </foreign-key>
@@ -99,6 +100,11 @@
       <index-column name="default_category" />
     </index>
     <behavior name="timestampable" />
+    <behavior name="sortable">
+      <parameter name="rank_column" value="position" />
+      <parameter name="use_scope" value="true" />
+      <parameter name="scope_column" value="category_id" />
+    </behavior>
   </table>
   <table name="country" namespace="Thelia\Model">
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />

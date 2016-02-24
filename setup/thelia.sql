@@ -79,6 +79,7 @@ CREATE TABLE `product_category`
     `product_id` INTEGER NOT NULL,
     `category_id` INTEGER NOT NULL,
     `default_category` TINYINT(1),
+    `position` INTEGER DEFAULT 0 NOT NULL,
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`product_id`,`category_id`),
