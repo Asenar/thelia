@@ -321,15 +321,41 @@ class Product extends BaseProduct implements FileModelParentInterface
      */
     public function setPosition($v)
     {
-        return parent::setPosition($v);
+        try
+        {
+            $id = $this->getId();
+            $default_category = ProductCategoryQuery::create()
+                ->filterByProductId($this->getId())
+                ->filterByDefaultCategory(true)
+                ->findOne();
+            if (!$default_category)
+						{
+							die("default category not found");
+                throw new \Exception("default categ not found for id product $id");
+						}
+
+            $set =  $default_category->setPosition($v);
+						return $set;
+        }
+        catch(\Exception $e)
+        {
+          echo "\nposition was $v, for product $id\n\n";
+          var_dump($e);
+					die();
+          //debug_print_backtrace();
+        }
     }
 
     /**
      * {@inheritDoc}
-     * @deprecated since version 2.3, was moved in \Thelia\Model\ProductCategory::setPosition
+     * @deprecated since version 2.3, was moved in \Thelia\Model\ProductCategory::getPosition
      */
     public function getPosition()
     {
-        return parent::getPosition();
+        $default_category = ProductCategoryQuery::create()
+            ->filterByProductId($this->getId())
+            ->filterByDefaultCategory(true)
+            ->findOne();
+        return $default_category->getPosition();
     }
 }

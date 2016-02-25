@@ -356,6 +356,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
             ->set("META_DESCRIPTION", $product->getVirtualColumn('i18n_META_DESCRIPTION'))
             ->set("META_KEYWORDS", $product->getVirtualColumn('i18n_META_KEYWORDS'))
             ->set("POSITION", $product->getVirtualColumn('productposition'))
+            //->set("POSITION", $product->getPosition())
             ->set("VIRTUAL", $product->getVirtual() ? "1" : "0")
             ->set("VISIBLE", $product->getVisible() ? "1" : "0")
             ->set("TEMPLATE", $product->getTemplateId())
