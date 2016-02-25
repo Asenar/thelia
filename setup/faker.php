@@ -27,6 +27,10 @@ $realTextMode = true;
 $localeList = array('fr_FR', 'en_US', 'es_ES', 'it_IT', 'de_DE');
 $numberCategories = 20;
 $numberProducts = 20;
+$numberCustomers = 5;
+$numberBrands = 5;
+$numberFolders = 2;
+$numberContents = 2;
 $countryStateList = [];
 
 $options = getopt("b:c:p:r:l:h");
@@ -69,6 +73,18 @@ if (isset($options['l'])) {
 if (isset($options['c'])) {
     if (0 !== intval($options['c'])) {
         $numberCategories = intval($options['c']);
+    }
+}
+
+if (isset($options['u'])) {
+    if (0 !== intval($options['u'])) {
+        $numberCustomers = intval($options['u']);
+    }
+}
+
+if (isset($options['brand'])) {
+    if (0 !== intval($options['brand'])) {
+        $numberBrands = intval($options['brand']);
     }
 }
 
@@ -260,7 +276,7 @@ try {
             ->save();
     }
 
-    for ($i = 0; $i < 50; $i++) {
+    for ($i = 0; $i < $numberCustomers; $i++) {
         $customer = new Thelia\Model\Customer();
         $country = getRandomCountry();
         $customer->createOrUpdate(
@@ -406,7 +422,7 @@ try {
         $document->setFolderId($folder->getId());
         generate_document($document, 'folder', $folder->getId());
 
-        for ($j=0; $j<3; $j++) {
+        for ($j=0; $j<$numberFolders; $j++) {
             $subfolder = new Thelia\Model\Folder();
             $subfolder->setParent($folder->getId());
             $subfolder->setVisible(1);
@@ -423,7 +439,7 @@ try {
             $document->setFolderId($folder->getId());
             generate_document($document, 'folder', $subfolder->getId());
 
-            for ($k=0; $k<4; $k++) {
+            for ($k=0; $k<$numberContents; $k++) {
                 $content = new Thelia\Model\Content();
                 $content->addFolder($subfolder);
 
@@ -455,7 +471,7 @@ try {
 
     $brandIdList = [];
 
-    for ($k=0; $k<10; $k++) {
+    for ($k=0; $k<$numberBrands; $k++) {
         $brand = new Thelia\Model\Brand();
 
         $brand->setVisible(1);
@@ -806,10 +822,18 @@ try {
 function createProduct($faker, Thelia\Model\Category $category, $position, $template, $brandIdList, &$productIdList, &$virtualProductList)
 {
     $product = new Thelia\Model\Product();
+		echo "add category ".$category->getId(). ' to that product';
     $product->setRef($category->getId() . '_' . $position . '_' . $faker->randomNumber(8));
     $product->addCategory($category);
     $product->setVisible(1);
+		echo "saving product, res =";
+    $res = $product->save();
+		echo PHP_EOL;
+		print_r($res);
     $productCategories = $product->getProductCategories();
+		echo PHP_EOL.' productCategories:';
+		print_r($productCategories);
+		die();
     $collection = new \Propel\Runtime\Collection\Collection();
     $collection->prepend($productCategories[0]->setDefaultCategory(1));
     $product->setProductCategories($collection);
