@@ -276,4 +276,22 @@ class Product extends BaseProduct implements FileModelParentInterface
 
         $this->dispatchEvent(TheliaEvents::AFTER_DELETEPRODUCT, new ProductEvent($this));
     }
+
+    /**
+     * {@inheritDoc}
+     * @deprecated since version 2.3, was moved in \Thelia\Model\ProductCategory::setPosition
+     */
+    public function setPosition($v)
+    {
+        return parent::setPosition($v);
+    }
+
+    /**
+     * {@inheritDoc}
+     * @deprecated since version 2.3, was moved in \Thelia\Model\ProductCategory::setPosition
+     */
+    public function getPosition()
+    {
+        return parent::getPosition();
+    }
 }
