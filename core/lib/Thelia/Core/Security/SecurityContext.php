@@ -17,6 +17,7 @@ use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Security\User\UserInterface;
 use Thelia\Core\Security\UserProvider\AdminUserProvider;
+use Thelia\Core\Security\UserProvider\CustomerUserProvider;
 use Thelia\Model\Customer;
 
 /**
@@ -209,6 +210,16 @@ class SecurityContext
     {
         // Find a user which matches the required roles.
         $user = $this->getCustomerUser();
+
+        if ($user) {
+            // check user still exists with the same password
+            $customerUserProvider = new CustomerUserProvider;
+            $userFromDB = $customerUserProvider->getUser($user->getUsername());
+            if (!$userFromDB || $userFromDB->getPassword() !== $user->getPassword()) {
+                $this->getSession()->clearCustomerUser();
+                $user = null;
+            }
+        }
 
         if (! $this->hasRequiredRole($user, $roles)) {
             $user = $this->getAdminUser();
