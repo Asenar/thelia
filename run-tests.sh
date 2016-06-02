@@ -4,16 +4,16 @@
 # --------------------------------------------------------------
 
 # will exit with non-zero error code if any of the command fails
-set -e
+#set -e
 
-echo "backup DB"
-mysqldump -h $DB_HOST -u $DB_USER thelia >../thelia.sql
-
-echo "phpunit"
-./bin/phpunit
-
-echo "restore DB"
-mysql -h $DB_HOST -u $DB_USER thelia <../thelia.sql
+#echo "backup DB"
+#mysqldump -h $DB_HOST -u $DB_USER thelia >../thelia.sql
+#
+#echo "phpunit"
+#./bin/phpunit
+#
+#echo "restore DB"
+#mysql -h $DB_HOST -u $DB_USER thelia <../thelia.sql
 
 echo "deactivate modules only needed by phpunit tests"
 php Thelia module:refresh

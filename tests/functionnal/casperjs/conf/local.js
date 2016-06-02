@@ -29,6 +29,7 @@ var screenshot_enabled = true;
 if (casper.cli.has('thelia2_screenshot_disabled')) {
     screenshot_enabled = false;
 }
+var screenshot_enabled = true;
 
 // Screenshot Dir
 var screenshot_dir = 'tests/functionnal/casperjs/screenshot/';

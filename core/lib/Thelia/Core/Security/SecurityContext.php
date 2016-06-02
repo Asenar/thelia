@@ -208,14 +208,20 @@ class SecurityContext
      */
     public function checkRole(array $roles)
     {
+        echo "start checKRole(roles)<br>roles:";
+        var_dump($roles);
         // Find a user which matches the required roles.
         $user = $this->getCustomerUser();
 
         if ($user) {
+            echo "current username is ".$user->getUsername()."<br>";
             // check user still exists with the same password
             $customerUserProvider = new CustomerUserProvider;
             $userFromDB = $customerUserProvider->getUser($user->getUsername());
             if (!$userFromDB || $userFromDB->getPassword() !== $user->getPassword()) {
+                echo "user:".$user->getPassword();
+                echo "userFromDB:".$userFromDB->getPassword(); // ' !== '.
+                die("userFromDB password is different or does not exists.");
                 $this->getSession()->clearCustomerUser();
                 $user = null;
             }

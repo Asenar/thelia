@@ -170,12 +170,21 @@ class Customer extends BaseAction implements EventSubscriberInterface
 
     public function login(CustomerLoginEvent $event)
     {
+        echo "start login() with customer event<br><pre>";
+        echo "1st call of event->getCustomer()<br>";
         $customer = $event->getCustomer();
 
+
         if (method_exists($customer, 'clearDispatcher')) {
+            echo "clearDispatcher() call<br>";
             $customer->clearDispatcher();
         }
-        $this->securityContext->setCustomerUser($event->getCustomer());
+        echo "2nd call of event->getCustomer()<br>";
+        $customer = $event->getCustomer();
+        //var_dump($customer);
+        echo "setCustomerUser to event->getCustomer() thing";
+        $this->securityContext->setCustomerUser($customer);
+        //var_dump($_SESSION);
     }
 
     /**
